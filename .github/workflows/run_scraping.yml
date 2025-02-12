@@ -1,0 +1,35 @@
+name: Update Spreadsheet Daily
+
+on:
+  schedule:
+    # 毎日 UTC 06:00 に実行
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # 手動実行を許可
+
+jobs:
+  update-spreadsheet:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Dependencies
+        run: |
+          pip install gspread oauth2client pandas selenium beautifulsoup4
+
+      - name: Set GOOGLE_CREDENTIALS to file
+        # GitHub Secrets に登録した GOOGLE_CREDENTIALS を読み込み、credentials.json として保存
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > credentials.json
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Run update_spreadsheet.py
+        run: |
+          python update_spreadsheet.py
