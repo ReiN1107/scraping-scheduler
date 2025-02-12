@@ -2,7 +2,6 @@ name: Run shimekiri notebook daily
 
 on:
   schedule:
-    # 毎日 UTC 06:00 に実行
     - cron: '0 6 * * *'
   workflow_dispatch:
 
@@ -20,10 +19,15 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # 1. Jupyterとipykernelをインストール
+          pip install jupyter ipykernel
+          # 2. python3 カーネルを作成
+          python -m ipykernel install --user --name python3
+          
+          # 3. papermill, nbconvert, selenium等もインストール
           pip install papermill nbconvert gspread oauth2client pandas selenium beautifulsoup4
 
       - name: Set GOOGLE_CREDENTIALS to file
-        # GitHub Secrets にサービスアカウントの JSON キーを貼り付けている前提
         run: |
           echo "$GOOGLE_CREDENTIALS" > credentials.json
         env:
@@ -31,4 +35,5 @@ jobs:
 
       - name: Run the Notebook with Papermill
         run: |
-          papermill shimekiri_gaishishukatsu_py.ipynb output.ipynb
+          # --kernel python3 を指定
+          papermill shimekiri_gaishishukatsu_py.ipynb output.ipynb --kernel python3
