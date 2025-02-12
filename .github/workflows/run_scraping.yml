@@ -1,15 +1,14 @@
-name: Update Spreadsheet Daily
+name: Run shimekiri notebook daily
 
 on:
   schedule:
     # 毎日 UTC 06:00 に実行
     - cron: '0 6 * * *'
-  workflow_dispatch:  # 手動実行を許可
+  workflow_dispatch:
 
 jobs:
-  update-spreadsheet:
+  run-notebook:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -21,15 +20,15 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install gspread oauth2client pandas selenium beautifulsoup4
+          pip install papermill nbconvert gspread oauth2client pandas selenium beautifulsoup4
 
       - name: Set GOOGLE_CREDENTIALS to file
-        # GitHub Secrets に登録した GOOGLE_CREDENTIALS を読み込み、credentials.json として保存
+        # GitHub Secrets にサービスアカウントの JSON キーを貼り付けている前提
         run: |
           echo "$GOOGLE_CREDENTIALS" > credentials.json
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - name: Run shimekiri_gaishishukatsu_py.ipynb
+      - name: Run the Notebook with Papermill
         run: |
-          python shimekiri_gaishishukatsu_py.ipynb
+          papermill shimekiri_gaishishukatsu_py.ipynb output.ipynb
