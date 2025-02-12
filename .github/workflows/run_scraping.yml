@@ -30,6 +30,6 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
-      - name: Run update_spreadsheet.py
+      - name: Run shimekiri_gaishishukatsu_py.ipynb
         run: |
-          python update_spreadsheet.py
+          python shimekiri_gaishishukatsu_py.ipynb
